@@ -1,6 +1,7 @@
 # 📚 AI Teacher
 
    🔗 **Live demo:** https://ai-teacher-l2ujonluk9ma9gmrzqzmtq.streamlit.app
+   
 An LLM-powered study tool: upload a PDF of your notes or study material,
 and AI Teacher will:
 
@@ -93,7 +94,7 @@ This opens the app in your browser at `http://localhost:8501`.
 - Very long PDFs are trimmed to the first ~12,000 characters to keep
   the request within a reasonable size — good for a single chapter or
   a set of notes, not an entire textbook.
-
+- Google frequently updates/retires Gemini model names — if you get a "model not found" error, check aistudio.google.com/models for the current model name and update it in `app.py`.
 ## Possible next steps
 
 - Add OCR support for scanned PDFs (e.g. via `pytesseract`)
