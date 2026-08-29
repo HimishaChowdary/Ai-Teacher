@@ -79,9 +79,10 @@ streamlit run app.py
 This opens the app in your browser at `http://localhost:8501`.
 
 ## Screenshot
+<img width="1916" height="857" alt="image" src="https://github.com/user-attachments/assets/7babcf85-f397-405e-95ca-38b3a5e5ea94" />
 
-*(Add a screenshot or short GIF here of the app — upload screen and the
-quiz results screen make the best impression.)*
+<img width="1912" height="866" alt="ai teacher" src="https://github.com/user-attachments/assets/02a30ddb-8c05-4444-9f48-b8bb608c0d39" />
+
 
 ## Known limitations
 
