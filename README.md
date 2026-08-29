@@ -1,3 +1,25 @@
+# 📚 AI Teacher
+
+🔗 **Live demo:** https://ai-teacher-l2ujonluk9ma9gmrzqzmtq.streamlit.app
+
+An LLM-powered study tool: upload a PDF of your notes or study material,
+and AI Teacher will:
+
+1. Read and understand the content of the PDF
+2. Generate multiple choice questions based strictly on that content
+3. Let you take the quiz right in the app
+4. Score your test and show you the correct answers
+5. Explain *why* each correct answer is correct, so you actually learn
+   from your mistakes instead of just seeing a grade
+
+## Why I built this
+
+I wanted a hands-on project that used a real RAG-adjacent pattern
+(extract content → ground the LLM in it → generate structured output)
+instead of a toy chatbot demo. This also directly practices turning a
+plain Python script into a usable web app with Streamlit.
+
+## How it works
 
 The model is explicitly instructed not to invent facts outside the
 uploaded document, and to return machine-readable JSON so the app can
