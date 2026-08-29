@@ -10,7 +10,7 @@ import json
 import os
 
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 from pypdf import PdfReader
 
 st.set_page_config(page_title="AI Teacher", page_icon="📚", layout="centered")
@@ -19,12 +19,13 @@ st.set_page_config(page_title="AI Teacher", page_icon="📚", layout="centered")
 # Helpers
 # ---------------------------------------------------------------------------
 
-def get_client() -> OpenAI:
-    """Build an OpenAI client from an API key in env var or sidebar input."""
-    api_key = os.environ.get("OPENAI_API_KEY") or st.session_state.get("api_key")
+def get_model():
+    """Build a Gemini model from an API key in env var or sidebar input."""
+    api_key = os.environ.get("GOOGLE_API_KEY") or st.session_state.get("api_key")
     if not api_key:
         return None
-    return OpenAI(api_key=api_key)
+    genai.configure(api_key=api_key)
+    return genai.GenerativeModel("gemini-1.5-flash")
 
 
 def extract_text_from_pdf(uploaded_file) -> str:
@@ -37,7 +38,7 @@ def extract_text_from_pdf(uploaded_file) -> str:
     return "\n".join(text_parts).strip()
 
 
-def generate_quiz(client: OpenAI, study_text: str, num_questions: int) -> list[dict]:
+def generate_quiz(model, study_text: str, num_questions: int) -> list[dict]:
     """
     Ask the LLM to generate MCQs from the study text.
     Returns a list of dicts: {question, options, correct_index, explanation}
@@ -46,13 +47,11 @@ def generate_quiz(client: OpenAI, study_text: str, num_questions: int) -> list[d
     max_chars = 12000
     trimmed_text = study_text[:max_chars]
 
-    system_prompt = (
-        "You are an expert teacher who writes exam-quality multiple choice "
-        "questions strictly based on the study material given to you. "
-        "Do not invent facts that are not supported by the material."
-    )
+    prompt = f"""
+You are an expert teacher who writes exam-quality multiple choice questions
+strictly based on the study material given to you. Do not invent facts that
+are not supported by the material.
 
-    user_prompt = f"""
 Study material:
 \"\"\"
 {trimmed_text}
@@ -76,16 +75,12 @@ exact shape:
 }}
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.4,
+    response = model.generate_content(
+        prompt,
+        generation_config={"temperature": 0.4},
     )
 
-    raw_content = response.choices[0].message.content.strip()
+    raw_content = response.text.strip()
 
     # Be defensive: strip markdown code fences if the model adds them anyway.
     if raw_content.startswith("```"):
@@ -114,10 +109,10 @@ if "answers" not in st.session_state:
 
 st.sidebar.header("Settings")
 
-if not os.environ.get("OPENAI_API_KEY"):
+if not os.environ.get("GOOGLE_API_KEY"):
     st.session_state.api_key = st.sidebar.text_input(
-        "OpenAI API key", type="password",
-        help="Get one at platform.openai.com. Not saved anywhere, only used for this session.",
+        "Google Gemini API key", type="password",
+        help="Get a free one at aistudio.google.com. Not saved anywhere, only used for this session.",
     )
 else:
     st.sidebar.success("API key loaded from environment.")
@@ -141,9 +136,9 @@ uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
 
 if uploaded_file and st.session_state.quiz is None:
     if st.button("Generate Quiz", type="primary"):
-        client = get_client()
-        if client is None:
-            st.error("Please enter your OpenAI API key in the sidebar first.")
+        model = get_model()
+        if model is None:
+            st.error("Please enter your Google Gemini API key in the sidebar first.")
         else:
             with st.spinner("Reading your PDF and writing questions..."):
                 try:
@@ -155,7 +150,7 @@ if uploaded_file and st.session_state.quiz is None:
                         )
                     else:
                         st.session_state.quiz = generate_quiz(
-                            client, study_text, num_questions
+                            model, study_text, num_questions
                         )
                         st.session_state.submitted = False
                         st.session_state.answers = {}
@@ -217,3 +212,4 @@ if st.session_state.quiz:
 
         st.divider()
         st.metric("Total score", f"{score} / {total}")
+       
