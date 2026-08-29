@@ -25,7 +25,7 @@ def get_model():
     if not api_key:
         return None
     genai.configure(api_key=api_key)
-        return genai.GenerativeModel("gemini-2.5-flash")
+    return genai.GenerativeModel("gemini-2.5-flash")
 
 
 def extract_text_from_pdf(uploaded_file) -> str:
@@ -212,4 +212,3 @@ if st.session_state.quiz:
 
         st.divider()
         st.metric("Total score", f"{score} / {total}")
-       
