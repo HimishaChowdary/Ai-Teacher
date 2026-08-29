@@ -1,5 +1,6 @@
 # 📚 AI Teacher
 
+   🔗 **Live demo:** https://ai-teacher-l2ujonluk9ma9gmrzqzmtq.streamlit.app
 An LLM-powered study tool: upload a PDF of your notes or study material,
 and AI Teacher will:
 
